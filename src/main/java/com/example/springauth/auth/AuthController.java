@@ -1,9 +1,15 @@
 package com.example.springauth.auth;
 
+import com.example.Entity.UserRoleEnum;
+import com.example.jwt.JwtUtil;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,9 +20,13 @@ import java.net.URLEncoder;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class AuthController {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
+
+    private final JwtUtil jwtUtil;
+
 
     /**
      * 쿠키를 만드는 메서드
@@ -37,10 +47,53 @@ public class AuthController {
 
     @GetMapping("/get-cookie")
     public String getCookie(@CookieValue(AUTHORIZATION_HEADER) String value) {
+
         System.out.println("value = " + value);
 
         return "getCookie : " + value;
      }
+
+    @GetMapping("/create-jwt")
+    public String createJwt(HttpServletResponse res) {
+        // Jwt 생성
+        String token = jwtUtil.createToken("Robbie", UserRoleEnum.USER);
+
+        // Jwt 쿠키 저장
+        jwtUtil.addJwtToCookie(token, res);
+
+        return "createJwt : " + token;
+    }
+
+    /**
+     * jwt 생성 및 조회
+     */
+    @GetMapping("/get-jwt")
+    public String getJwt(@CookieValue(JwtUtil.AUTHORIZATION_HEADER) String tokenValue) { //쿠키에서 해당 header key(쿠키 이름) 으로 value 가지고 오기
+        // JWT 토큰 substring
+        String token = jwtUtil.substringToken(tokenValue); //앞에 Bearer 제외하기
+
+        // 토큰 검증
+        if(!jwtUtil.validateToken(token)){
+            throw new IllegalArgumentException("Token Error");
+        }
+        /**
+         * JWT 는 3가지 부분으로 가지고있다
+         * Header 토큰의 메타데이터(알고리즘, 타입)
+         * Payload 실제 데이터 (Claims)
+         * Signature 토큰의 무결성을 검증하기 위한 서명
+         * 즉 Payload == Claims 이다
+         */
+        // 토큰에서 사용자 정보 가져오기
+        Claims info = jwtUtil.getUserInfoFromToken(token);
+        // 사용자 username
+        String username = info.getSubject();
+        System.out.println("username = " + username);
+        // 사용자 권한
+        String authority = (String) info.get(JwtUtil.AUTHORIZATION_KEY);
+        System.out.println("authority = " + authority);
+
+        return "getJwt : " + username + ", " + authority;
+    }
 
     @GetMapping("/create-session")
     public String createSession(HttpServletRequest req) {
