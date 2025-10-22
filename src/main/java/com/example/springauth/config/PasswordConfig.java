@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class PasswordConfig {
     /**
      * 스프링 빈 수동등록
-     * @return
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
