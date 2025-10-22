@@ -40,7 +40,7 @@ public class AuthController {
         System.out.println("value = " + value);
 
         return "getCookie : " + value;
-    }
+     }
 
     @GetMapping("/create-session")
     public String createSession(HttpServletRequest req) {

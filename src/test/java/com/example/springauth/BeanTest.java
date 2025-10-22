@@ -1,7 +1,7 @@
 package com.example.springauth;
 
 
-import com.example.springauth.food.Food;
+import com.example.springauth.beanColision.Food;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

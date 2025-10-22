@@ -1,4 +1,4 @@
-package com.example.springauth.food;
+package com.example.springauth.beanColision;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
