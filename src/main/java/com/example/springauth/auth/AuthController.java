@@ -1,15 +1,13 @@
 package com.example.springauth.auth;
 
-import com.example.Entity.UserRoleEnum;
-import com.example.jwt.JwtUtil;
+import com.example.springauth.Entity.UserRoleEnum;
+import com.example.springauth.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
