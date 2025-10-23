@@ -1,7 +1,7 @@
 package com.example.springauth.auth;
 
-import com.example.springauth.Entity.UserRoleEnum;
-import com.example.springauth.jwt.JwtUtil;
+import com.example.Entity.UserRoleEnum;
+import com.example.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
