@@ -1,6 +1,6 @@
-package com.example.jwt;
+package com.example.springauth.jwt;
 
-import com.example.Entity.UserRoleEnum;
+import com.example.springauth.Entity.UserRoleEnum;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;

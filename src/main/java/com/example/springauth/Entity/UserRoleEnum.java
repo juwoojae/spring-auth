@@ -1,4 +1,4 @@
-package com.example.Entity;
+package com.example.springauth.Entity;
 
 public enum UserRoleEnum {
     USER(Authority.USER),  // 사용자 권한
