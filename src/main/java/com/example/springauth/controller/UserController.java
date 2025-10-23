@@ -25,12 +25,12 @@ public class UserController {
         this.userService = userService;
         this.resourceHandlerMapping = resourceHandlerMapping;
     }
-
+    //로그인 페이지 조회
     @GetMapping("/user/login-page")
     public String loginPage() {
         return "login";
     }
-    //회원가입 페이지 호출
+    //회원가입 페이지 조회
     @GetMapping("/user/signup")
     public String signupPage() {
         return "signup";
@@ -45,7 +45,7 @@ public class UserController {
 
         return "redirect:/api/user/login-page";
     }
-
+    //로그인
     @PostMapping("/user/login")
     public String login(LoginRequestDto requestDto, HttpServletResponse res){
         try {
