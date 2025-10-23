@@ -29,9 +29,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         log.info("로그인 시도");
-        try {
+        try {//json 형태의 데이터를 객체로 직렬화하기
             LoginRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(), LoginRequestDto.class);
-
+            //AuthenticationManager 의 authenticate() 메서드 (username, password) 를 가지고와서 인증 처리하기
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(
                             requestDto.getUsername(),
@@ -45,6 +45,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
     }
 
+    /**
+     * Authentication 를 파라메터로 받아온다.
+     * @AuthenticationPrincipal UserDetailsImpl userDetails 멘치로 Authentication 에서 getPrincipal 을 한다
+     * Controller 에서는 UserDetailsService 에서 UserDetails 를 가지고 왔지만, Filter 에서는 DispatcherServlet 전 단계이므로
+     * 에노테이션이 아니라 (UserDetailsImpl) authResult.getPrincipal()) 이런식으로 가지고 온다.
+     */
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         log.info("로그인 성공 및 JWT 생성");
