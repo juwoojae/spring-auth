@@ -57,19 +57,21 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter { //OncePerRequ
 
     /**
      *“JWT 인증을 스프링 시큐리티 내부 구조(SecurityContext)에 반영하는 과정”
+     * 여기서 이렇게 SecurityContext 서버에서 가지고 있고 Controller 에서 쓸모있게 사용한다
      */
     // 인증 처리
     public void setAuthentication(String username) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
+        //인증 Filter 에서는 권한 까지는 토큰에 담기지 않았지만 여기서는 토큰에 권한을 담는다
         Authentication authentication = createAuthentication(username); //유저 정보로 인증 객체 생성
-        context.setAuthentication(authentication);
 
+        context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context); //현재 요청을 인증된 상태로 설정
     }
 
     // 인증 객체 생성
     private Authentication createAuthentication(String username) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());  //인가
     }
 }

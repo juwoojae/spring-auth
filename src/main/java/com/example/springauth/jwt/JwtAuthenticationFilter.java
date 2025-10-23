@@ -18,6 +18,7 @@ import java.io.IOException;
 
 /**
  * 인증 Authentication 필터
+ * 로그인을 했을때 JWT 를 생성하는게 맞지
  */
 
 @Slf4j(topic = "로그인 및 JWT 생성")
