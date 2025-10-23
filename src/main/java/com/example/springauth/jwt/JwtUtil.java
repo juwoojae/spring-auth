@@ -1,14 +1,21 @@
 package com.example.springauth.jwt;
 
+import io.jsonwebtoken.*;
 import com.example.springauth.Entity.UserRoleEnum;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -19,6 +26,7 @@ import java.util.Date;
  * ex) String $ 로 반환
  */
 
+@Component
 public class JwtUtil {
     // Header KEY 값
 
@@ -52,7 +60,7 @@ public class JwtUtil {
     // JWT 토큰 생성
     public String createToken(String username, UserRoleEnum role) {
         Date date = new Date();
-
+        // 빌더 패턴 (메서드 체이닝)
         return BEARER_PREFIX +
                 Jwts.builder()
                         .setSubject(username) // 사용자 식별자값(ID)
@@ -63,11 +71,54 @@ public class JwtUtil {
                         .compact(); //리턴값은 String
     }
 
-    // 생성된 JWT 를 Cookie 에 저장
+    // JWT Cookie 에 저장
+    public void addJwtToCookie(String token, HttpServletResponse res) {
+        try {
+            token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
 
-    // Cookie 에 들어있던 JWT 토큰을 Substring
+            Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token); // Name-Value
+            cookie.setPath("/");
 
-    // JWT 검증
+            // Response 객체에 Cookie 추가
+            res.addCookie(cookie);
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage());
+        }
+    }
 
-    // JWT 에서 사용자 정보 가지고 오기
+    /**
+     * JWT 토큰의(String) 에서 Bearer_ 만큼을 제외한 SubString 이 필요하다
+     */
+
+    // JWT 토큰 substring
+    public String substringToken(String tokenValue) {
+        if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) { //null 인지 아닌지, BEARER_PREFIX로 시작하는지 안하는지
+            return tokenValue.substring(7);
+        }
+        logger.error("Not Found Token");
+        throw new NullPointerException("Not Found Token");
+    }
+
+    // 토큰 검증
+    public boolean validateToken(String token) {
+        try {
+            //토큰의 위/변조가 있는지, 만료가 되지는 않았는지 확인할수 있다
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (SecurityException | MalformedJwtException | SignatureException e) {
+            logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
+        } catch (ExpiredJwtException e) {
+            logger.error("Expired JWT token, 만료된 JWT token 입니다.");
+        } catch (UnsupportedJwtException e) {
+            logger.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+        } catch (IllegalArgumentException e) {
+            logger.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+        }
+        return false;
+    }
+
+    // 토큰에서 사용자 정보 가져오기
+    public Claims getUserInfoFromToken(String token) {//정보를 찾아오려면 시큐리티 키값이 필요함
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    }
 }
