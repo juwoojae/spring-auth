@@ -45,6 +45,7 @@ public class JwtUtil {
 
     private Key key; //@PostConstruct 에서 초기화
 
+    //암호화 알고리즘
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
     // 로그 설정
@@ -53,11 +54,16 @@ public class JwtUtil {
     @PostConstruct
     public void init() {
         byte[] bytes = Base64.getDecoder().decode(secretKey);
-        key = Keys.hmacShaKeyFor(bytes);
+        key = Keys.hmacShaKeyFor(bytes); //Base64 로 인코딩 되어 있던 문자열을 다시 원래의 바이트 배열로 복원하는 과정(이게 진짜 secretKey 의 원본) ex 우리가 원래 byte 배열을 etf-8 로 encoding 해서 한국어로 만드는것처럼
     }
     //여기까지 데이터 준비코드
 
-    // JWT 토큰 생성
+    /**
+     * 이 코드를 실행하면
+     * JWT 의
+     * header, payload, signature 를 알잘딱 만들어주고, JWT 를 만들어준다.
+     * signWith() 로 signature 로 만드려면 byte 코드로 디코딩 되어 있어야 한다
+     */
     public String createToken(String username, UserRoleEnum role) {
         Date date = new Date();
         // 빌더 패턴 (메서드 체이닝)
@@ -67,8 +73,8 @@ public class JwtUtil {
                         .claim(AUTHORIZATION_KEY, role) // 사용자 권한
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME)) // 만료 시간
                         .setIssuedAt(date) // 발급일
-                        .signWith(key, signatureAlgorithm) // 암호화 알고리즘
-                        .compact(); //리턴값은 String
+                        .signWith(key, signatureAlgorithm) //signature 자동 생성
+                        .compact(); //리턴값은 String (최종 JWT 문자열 완성 코드)
     }
 
     // JWT Cookie 에 저장
@@ -122,3 +128,8 @@ public class JwtUtil {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 }
+/**
+ * 시크릿 키는 서버에 존재해야 한다
+ * 시그니쳐는 header+payload+secretKey 의 3개를 디코딩(바이트 코드로) 한후, 특정 시그니처 알고리즘으로 조합해서 사용한다
+ * 이것으로 토큰의 위조 유무를 파악할수 있다.
+ */
