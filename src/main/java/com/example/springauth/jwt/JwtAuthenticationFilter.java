@@ -16,6 +16,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.io.IOException;
 
+/**
+ * 인증 Authentication 필터
+ */
+
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -37,7 +41,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                             requestDto.getUsername(),
                             requestDto.getPassword(),
                             null
-                    )
+                    )  //Authentication 객체를 만든 후에 리턴
             );
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -51,14 +55,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
      * Controller 에서는 UserDetailsService 에서 UserDetails 를 가지고 왔지만, Filter 에서는 DispatcherServlet 전 단계이므로
      * 에노테이션이 아니라 (UserDetailsImpl) authResult.getPrincipal()) 이런식으로 가지고 온다.
      */
+
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         log.info("로그인 성공 및 JWT 생성");
-        String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
-        UserRoleEnum role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getRole();
+        String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername(); //Authentication 에서 username 가지고 오기
+        UserRoleEnum role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getRole(); //Authentication 에서 role 가지고 오기
 
-        String token = jwtUtil.createToken(username, role);
-        jwtUtil.addJwtToCookie(token, response);
+        String token = jwtUtil.createToken(username, role); //토큰 생성후
+        jwtUtil.addJwtToCookie(token, response);  //쿠키에 넣기
     }
 
     @Override
