@@ -7,6 +7,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * 스프링 시큐리티가 제공해주는 SecurityFilterChain
+ *
+ */
 @Configuration
 @EnableWebSecurity // Spring Security 지원을 가능하게 함
 public class WebSecurityConfig {

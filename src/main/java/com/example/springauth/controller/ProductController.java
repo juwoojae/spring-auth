@@ -2,6 +2,7 @@ package com.example.springauth.controller;
 
 import ch.qos.logback.core.model.Model;
 import com.example.springauth.Entity.User;
+import com.example.springauth.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,17 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/api")
 public class ProductController {
-
     /**
-     *@AuthenticationPrincipal 는 SecurityController 안에 저장된 Authentication 객체를
-     * 자동으로 꺼내서 그안의 principal 주체 , 즉 로그인한 사용자 정보를 구입해주는 기능
+     * Authentication 의 Principal 에 저장된 UserDetailsImpl 를 가지고 올수 있다.
+     *
      */
     @GetMapping("/products")
-    public String getProducts(@AuthenticationPrincipal UserDetails userDetails) {
-
-        User user = userDetails.getUser();
+    public String getProducts(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        // Authentication 의 Principal 에 저장된 UserDetailsImpl 을 가져옵니다.
+        User user =  userDetails.getUser();
+        System.out.println("user.getUsername() = " + user.getUsername());
 
         return "redirect:/";
     }
-
 }
