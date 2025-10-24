@@ -78,10 +78,26 @@ public class WebSecurityConfig {
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class); //jwtAuthorizationFilter ->  JwtAuthenticationFilter -> .. 순으로 실행
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); //이렇게 써도 UsernamePasswordAuthenticationFilter.class 는 실행 안됨.
 
+        //접근 불가 페이지 설정
+        http.exceptionHandling((exceptionHandling) ->exceptionHandling.accessDeniedPage("/forbidden.html"));
+
         return http.build();
     }
 }
 /**
  * 스프링 시큐리티에서 기본으로 제공하는 로그인 폼(formLogin) 은 세션(Session) 을 사용해서 인증 상태를 유지
+ *  1. 로그인 요청일때
+ *  (1) JwtAuthorizationFilter
+ *  토큰이 없으므로 인증(SecurityContext 세팅) 패스
+ *  doFilter()로 다음 필터로 진행
+ *  (2) JwtAuthenticationFilter
+ *  로그인 요청 -> id/pw 검증후 (DetailsService로) JWT 발행
+ *  JWT 를 쿠키나 응답 헤더에 담아 클라이언트로 전달
  *
+ *  2. 로그인 후 요청하기(JWT 포함)
+ *  (1) JwtAuthorizationFilter
+ *  JWT 검증 → 유효하면 SecurityContext에 인증(Authentication) 객체 세팅
+ *  SecurityContext에 인증 정보가 들어있으므로 인가(Authorization) 로직 적용 가능
+ *  (2) JwtAuthenticationFilter
+ *  로그인 요청이 아니므로 실행되지 않음
  */
