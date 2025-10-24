@@ -17,6 +17,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 
 /**
+ *UsernamePasswordAuthenticationFilter 는 From Login 기반을 사용할 때 username 과 password 를 확인하여 인증한다
+ * 사용자가 username과 password를 제출 하면 UsernamePasswordAuthenticationFilter 는 (인증된) 사용자의 정보가 담기는 인증객체인
+ * Authentication의 종류 중 하나인  UsernamePasswordAuthenticationToken을 만들어 AuthenticationManager에게 넘겨 인증을 시도
+ *
  * 인증 Authentication 필터
  * 로그인을 했을때 JWT 를 생성하는게 맞지
  */
@@ -51,6 +55,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     /**
+     * 이 중간에 AuthenticationManager 가 인증처리를 하고, 인증 성공시 successfulAuthentication() 를, 실패시 unsuccessfulAuthentication 를 호출한다.
+     *
+     *
      * Authentication 를 파라메터로 받아온다.
      * @AuthenticationPrincipal UserDetailsImpl userDetails 멘치로 Authentication 에서 getPrincipal 을 한다
      * Controller 에서는 UserDetailsService 에서 UserDetails 를 가지고 왔지만, Filter 에서는 DispatcherServlet 전 단계이므로
